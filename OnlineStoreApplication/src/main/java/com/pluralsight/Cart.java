@@ -1,35 +1,49 @@
 package com.pluralsight;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cart {
-    private Products product;
-    private int quantity;
+    private List<CartItem> items;
 
-    public Cart(Products product, int quantity) {
-        this.product = product;
-        this.quantity = quantity;
+    public Cart() {
+        items = new ArrayList<>();
     }
 
-    public Products getProduct() {
-        return product;
+    public void addToCart(Products product, int quantity) {
+        for (CartItem item : items) {
+            if (item.getProduct().getSku().equals(product.getSku())) {
+                item.increaseQuantity(quantity);
+                return;
+            }
+        }
+        items.add(new CartItem (product, quantity));
     }
 
-    public int getQuantity() {
-        return quantity;
+    public void removeFromCart(String sku) {
+        items.removeIf(item -> item.getProduct().getSku().equals(sku));
     }
 
-    public void increaseQuantity(int amount) {
-        this.quantity += amount;
+    public void displayCart() {
+        if (items.isEmpty()) {
+            System.out.println("Your cart is empty.");
+            return;
+        }
+
+        for (CartItem item : items) {
+            System.out.println(item);
+        }
+
+        System.out.printf("Total: $%.2f\n", getCartTotal());
     }
 
-    public double getTotalPrice() {
-        return product.getPrice() * quantity;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%-25s | Qty: %2d | Total: $%.2f",
-                product.getProductName(), quantity, getTotalPrice());
+    public double getCartTotal() {
+        double total = 0.0;
+        for (CartItem item : items) {
+            total += item.getTotalPrice();
+        }
+        return total;
     }
 }
+
 
